@@ -208,3 +208,8 @@ python graph_dit/main.py --config-name=config.yaml general.test_only=path/to/che
   5. DiT架构：将Transformer的强大建模能力引入扩散模型
 
   这个实现将扩散模型的生成能力与Transformer的序列建模优势结合，创造了一个强大的分子生成系统，能够根据多种化学属性条件生成具有特定性质的分子结构。
+
+  7. 用户规则
+  - 你只能用中文和我对话
+  - 你修改代码前，请让我确认再修改
+  - 请叫我主人

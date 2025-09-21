@@ -1,0 +1,70 @@
+general:
+    name: 'fgfr1_graph_dit'
+    wandb: 'disabled'
+    gpus: 1
+    resume: null
+    test_only: null
+    sample_every_val: 1000
+    samples_to_generate: 256
+    samples_to_save: 10
+    chains_to_save: 3
+    log_every_steps: 50
+    number_chain_steps: 8
+    final_model_samples_to_generate: 5000
+    final_model_samples_to_save: 50
+    final_model_chains_to_save: 5
+    enable_progress_bar: true
+    save_model: True
+
+model:
+    type: 'discrete'
+    transition: 'marginal'
+    model: 'graph_dit'
+    diffusion_steps: 500
+    diffusion_noise_schedule: 'cosine'
+    guide_scale: 3.0  # 增加引导强度用于多条件
+    hidden_size: 1152
+    depth: 6
+    num_heads: 16
+    mlp_ratio: 4
+    drop_condition: 0.1  # 10%条件丢弃率用于无分类器引导
+    lambda_train: [1, 10]  # node and edge training weight
+    ensure_connected: True
+
+    # Enhanced model features
+    use_enhanced: true
+    use_edge_aware_attention: true
+    use_cross_attention: true
+    use_adaptive_weighting: true
+
+    # Fast sampling settings
+    use_fast_sampling: true
+    fast_steps: 50
+    ddim_eta: 0.0
+
+    # Chemical constraints
+    use_constraints: true
+    valence_weight: 10.0
+    connectivity_weight: 5.0
+    symmetry_weight: 1.0
+    constraint_initial: 0.1
+    constraint_final: 1.0
+    constraint_warmup: 1000
+    constraint_guidance: 1.0
+
+train:
+    n_epochs: 5000
+    batch_size: 64  # 减小批大小适应多条件训练
+    lr: 0.0001     # 降低学习率确保稳定性
+    clip_grad: 1.0  # 添加梯度裁剪
+    num_workers: 0
+    weight_decay: 1e-5
+    seed: 42
+    val_check_interval: null
+    check_val_every_n_epoch: 10
+
+dataset:
+    datadir: 'data/'
+    task_name: 'fgfr1'
+    guidance_target: 'ld50-label-solubility'  # 多条件：毒性-标签-溶解度
+    pin_memory: False

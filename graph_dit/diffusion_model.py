@@ -98,7 +98,10 @@ class Graph_DiT(pl.LightningModule):
                             Xdim=self.Xdim,
                             Edim=self.Edim,
                             ydim=self.ydim,
-                            task_type=dataset_infos.task_type)
+                            task_type=dataset_infos.task_type,
+                            use_kan=getattr(cfg.model, 'use_kan', False),
+                            grid_size=getattr(cfg.model, 'kan_grid_size', 5),
+                            spline_order=getattr(cfg.model, 'kan_spline_order', 3))
         
         self.noise_schedule = PredefinedNoiseScheduleDiscrete(cfg.model.diffusion_noise_schedule,
                                                               timesteps=cfg.model.diffusion_steps)

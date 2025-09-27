@@ -1,7 +1,7 @@
 general:
     name: 'graph_dit'
     wandb: 'disabled' 
-    gpus: 1
+    gpus: 8
     resume: null
     test_only: null
     sample_every_val: 2500
@@ -30,19 +30,24 @@ model:
     lambda_train: [1, 10]  # node and edge training weight
     ensure_connected: True
 
-    # Enhanced model features
-    use_enhanced: true
+    # Enhanced model features (DISABLED for original paper comparison)
+    use_enhanced: false
     use_edge_aware_attention: true
-    use_cross_attention: true
-    use_adaptive_weighting: true
+    use_cross_attention: false
+    use_adaptive_weighting: false
 
-    # Fast sampling settings
-    use_fast_sampling: true
-    fast_steps: 50  # Much faster than 500 steps
-    ddim_eta: 0.0  # Deterministic sampling
+    # KAN (Kolmogorov-Arnold Networks) integration
+    use_kan: true
+    kan_grid_size: 5
+    kan_spline_order: 3
 
-    # Chemical constraints
-    use_constraints: true
+    # Fast sampling settings (DISABLED - use original 500 steps)
+    use_fast_sampling: false
+    fast_steps: 500  # Original paper setting
+    ddim_eta: 0.0
+
+    # Chemical constraints (DISABLED)
+    use_constraints: false
     valence_weight: 10.0
     connectivity_weight: 5.0
     symmetry_weight: 1.0

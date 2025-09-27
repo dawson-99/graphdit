@@ -23,6 +23,7 @@ task_to_colname = {
     'O2': 'O2',
     'N2': 'N2',
     'CO2': 'CO2',
+    'fgfr1': 'label',
 }
 
 tasktype_name = {
@@ -32,6 +33,7 @@ tasktype_name = {
     'O2': 'regression',
     'N2': 'regression',
     'CO2': 'regression',
+    'fgfr1': 'regression',
 }
 
 class TaskModel():

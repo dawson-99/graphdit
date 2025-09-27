@@ -17,9 +17,9 @@ from torch_geometric.data import Data, InMemoryDataset
 from torch_geometric.loader import DataLoader
 from sklearn.model_selection import train_test_split
 
-import utils as utils
-from datasets.abstract_dataset import AbstractDatasetInfos, AbstractDataModule
-from diffusion.distributions import DistributionNodes
+import graph_dit.utils as utils
+from graph_dit.datasets.abstract_dataset import AbstractDatasetInfos, AbstractDataModule
+from graph_dit.diffusion.distributions import DistributionNodes
 
 bonds = {BT.SINGLE: 1, BT.DOUBLE: 2, BT.TRIPLE: 3, BT.AROMATIC: 4}
 
@@ -136,7 +136,7 @@ class Dataset(InMemoryDataset):
         data_path = osp.join(self.raw_dir, self.raw_file_names[0])
         data_df = pd.read_csv(data_path)
        
-        def mol_to_graph(mol, sa, sc, target, target2=None, target3=None, valid_atoms=None):
+        def mol_to_graph(mol, sa, sc, target, target2=None, target3=None, target4=None, target5=None, valid_atoms=None):
             type_idx = []
             heavy_atom_indices, active_atoms = [], []
             for atom in mol.GetAtoms():
@@ -163,7 +163,11 @@ class Dataset(InMemoryDataset):
             edge_type = torch.tensor(edge_type, dtype=torch.long)
             edge_attr = edge_type
 
-            if target3 is not None:
+            if target5 is not None:
+                y = torch.tensor([sa, sc, target, target2, target3, target4, target5], dtype=torch.float).view(1,-1)
+            elif target4 is not None:
+                y = torch.tensor([sa, sc, target, target2, target3, target4], dtype=torch.float).view(1,-1)
+            elif target3 is not None:
                 y = torch.tensor([sa, sc, target, target2, target3], dtype=torch.float).view(1,-1)
             elif target2 is not None:
                 y = torch.tensor([sa, sc, target, target2], dtype=torch.float).view(1,-1)
@@ -185,12 +189,18 @@ class Dataset(InMemoryDataset):
                 if i == sms:
                     sms = df_row['smiles']
                 mol = Chem.MolFromSmiles(sms, sanitize=False)
-                if len(self.target_prop.split('-')) == 2:
-                    target1, target2 = self.target_prop.split('-')
-                    data, cur_active_atoms = mol_to_graph(mol, df_row['SA'], df_row['SC'], df_row[target1], target2=df_row[target2])
+                if len(self.target_prop.split('-')) == 5:
+                    target1, target2, target3, target4, target5 = self.target_prop.split('-')
+                    data, cur_active_atoms = mol_to_graph(mol, df_row['SA'], df_row['SC'], df_row[target1], target2=df_row[target2], target3=df_row[target3], target4=df_row[target4], target5=df_row[target5])
+                elif len(self.target_prop.split('-')) == 4:
+                    target1, target2, target3, target4 = self.target_prop.split('-')
+                    data, cur_active_atoms = mol_to_graph(mol, df_row['SA'], df_row['SC'], df_row[target1], target2=df_row[target2], target3=df_row[target3], target4=df_row[target4])
                 elif len(self.target_prop.split('-')) == 3:
                     target1, target2, target3 = self.target_prop.split('-')
                     data, cur_active_atoms = mol_to_graph(mol, df_row['SA'], df_row['SC'], df_row[target1], target2=df_row[target2], target3=df_row[target3])
+                elif len(self.target_prop.split('-')) == 2:
+                    target1, target2 = self.target_prop.split('-')
+                    data, cur_active_atoms = mol_to_graph(mol, df_row['SA'], df_row['SC'], df_row[target1], target2=df_row[target2])
                 else:
                     data, cur_active_atoms = mol_to_graph(mol, df_row['SA'], df_row['SC'], df_row[self.target_prop])
                 active_atoms.update(cur_active_atoms)
@@ -209,6 +219,7 @@ class DataInfos(AbstractDatasetInfos):
             'O2': 'regression',
             'N2': 'regression',
             'CO2': 'regression',
+            'fgfr1': 'regression',
         }
         task_name = cfg.dataset.task_name
         self.task = task_name

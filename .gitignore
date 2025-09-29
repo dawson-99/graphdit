@@ -170,7 +170,6 @@ mini-moses-master/
 *.pth
 *.pt
 *.ckpt
-models/
 checkpoints/
 data/
 graph_dit/outputs/
